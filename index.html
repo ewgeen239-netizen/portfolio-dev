@@ -720,6 +720,10 @@ const RESET_SCROLL_ON_LOAD = true;                         // on refresh, jump p
 if('scrollRestoration' in history) history.scrollRestoration = 'manual';
 if(RESET_SCROLL_ON_LOAD) window.scrollTo(0,0);
 const lenis = new Lenis({ smoothWheel:true });
+if(RESET_SCROLL_ON_LOAD){
+  lenis.scrollTo(0,{ immediate:true });                    // sync Lenis' virtual scroll to top too
+  addEventListener('load', ()=>{ window.scrollTo(0,0); lenis.scrollTo(0,{ immediate:true }); });
+}
 function raf(t){ lenis.raf(t); requestAnimationFrame(raf); }
 requestAnimationFrame(raf);
 
