@@ -9,19 +9,19 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preload" as="image" href="https://api.getlayers.ai/storage/v1/object/public/public/assets/lumora-e8b711fc68/hero/after.jpg" fetchpriority="high">
 <style>
 /* ---------- reset / base ---------- */
 *{ box-sizing:border-box; margin:0; padding:0 }
 html{ font-size:16px; -webkit-font-smoothing:antialiased }
 body{
   color:#111111; font-family:'Onest',sans-serif; overflow-x:hidden;
-  background-color:#e3e2df;
+  background-color:#dcdad4;
   background-image:
-    radial-gradient(circle at 1px 1px, rgba(17,17,17,.05) 1px, transparent 0),
-    radial-gradient(circle at 11px 11px, rgba(17,17,17,.028) 1px, transparent 0),
-    linear-gradient(180deg, #ededeb 0%, #e5e4e0 42%, #d6d5d0 100%);
-  background-size:22px 22px, 22px 22px, 100% 100%;
-  background-repeat:repeat, repeat, no-repeat;
+    radial-gradient(circle at 1px 1px, rgba(17,17,17,.06) 1px, transparent 0),
+    radial-gradient(circle at 11px 11px, rgba(17,17,17,.032) 1px, transparent 0);
+  background-size:22px 22px, 22px 22px;
+  background-attachment:fixed, fixed;
 }
 a{ color:inherit; text-decoration:none }
 button{ font:inherit; color:inherit; background:none; border:none; cursor:pointer }
@@ -363,6 +363,7 @@ footer .inner{ position:relative; z-index:10; padding:5rem 1.25rem 2.5rem }
 .navlang:hover{ color:#fff; border-color:rgba(255,255,255,.4) }
 .navlang.active{ background:#cf8047; border-color:#cf8047; color:#fff }
 .merr{ font-size:.8125rem; color:#b15f2c; line-height:1.4 }
+.cv{ content-visibility:auto; contain-intrinsic-size:auto 640px }
 [hidden]{ display:none !important }
 </style>
 </head>
@@ -404,7 +405,7 @@ footer .inner{ position:relative; z-index:10; padding:5rem 1.25rem 2.5rem }
   <!-- ============ HERO ============ -->
   <section id="home">
     <div class="liquid" id="liquid">
-      <img id="heroImg" alt="BNSH studio work" src="https://api.getlayers.ai/storage/v1/object/public/public/assets/lumora-e8b711fc68/hero/after.jpg" />
+      <img id="heroImg" alt="BNSH studio work" decoding="async" fetchpriority="high" src="https://api.getlayers.ai/storage/v1/object/public/public/assets/lumora-e8b711fc68/hero/after.jpg" />
       <canvas id="heroCanvas" aria-hidden="true"></canvas>
     </div>
     <div class="vignette"></div>
@@ -484,7 +485,7 @@ footer .inner{ position:relative; z-index:10; padding:5rem 1.25rem 2.5rem }
   </section>
 
   <!-- ============ CREATE BAND ============ -->
-  <section class="createband" style="background:transparent">
+  <section class="createband cv" style="background:transparent">
     <ul class="shell">
       <li class="rv rv-up" style="--rv-y:28px" data-delay="0"><div class="create-tile v-light" data-i18n="cb_we">We</div></li>
       <li class="rv rv-up" style="--rv-y:28px" data-delay="120"><div class="create-tile v-accent" data-i18n="cb_build">Build</div></li>
@@ -526,7 +527,7 @@ footer .inner{ position:relative; z-index:10; padding:5rem 1.25rem 2.5rem }
 </main>
 
 <!-- ============ FOOTER ============ -->
-<footer>
+<footer class="cv">
   <div class="inner shell">
     <div class="foot-cta">
       <h2 class="foot-h2 linereveal" data-linestagger="100">
@@ -622,6 +623,12 @@ footer .inner{ position:relative; z-index:10; padding:5rem 1.25rem 2.5rem }
       <h2 data-i18n="success_heading">Request received</h2>
       <p data-i18n="success_text">Thanks for reaching out — we'll get back to you within one business day.</p>
       <button class="pill noarrow v-dark" id="successClose"><span class="scale"><span class="body" data-i18n="close">Close</span></span></button>
+    </div>
+    <div id="modalAlready" class="success" hidden>
+      <div class="badge"><span class="svg-icon" data-icon="logo"></span></div>
+      <h2 id="alreadyHeading">You're already on our list</h2>
+      <p id="alreadyText">We've received your request — we'll get back to you within one business day.</p>
+      <button class="pill noarrow v-dark" id="alreadyClose"><span class="scale"><span class="body" data-i18n="close">Close</span></span></button>
     </div>
   </div>
 </div>
@@ -823,7 +830,7 @@ PORTFOLIO.forEach((p,i)=>{
   if(p.url){ a.target='_blank'; a.rel='noopener noreferrer'; }
   const art=document.createElement('article'); art.className='port-card'+(p.img?' has-photo':'');
   art.innerHTML=`
-    ${p.img?`<img class="port-photo" src="${p.img}" alt="${p.name} website screenshot" loading="lazy" />`:''}
+    ${p.img?`<img class="port-photo" src="${p.img}" alt="${p.name} website screenshot" loading="lazy" decoding="async" />`:''}
     <div class="port-meta"><span>${pf.catKey?`<span data-i18n="${pf.catKey}">${t(pf.catKey)}</span>`:p.cat} — ${p.year}</span><span class="port-badge">${icon('arrowup')}</span></div>
     <div class="port-wm">${icon('logo')}<sup>®</sup></div>
     <div class="port-bottom">
@@ -1058,11 +1065,26 @@ const modalFormBox=document.getElementById('modalForm');
 const modalSuccess=document.getElementById('modalSuccess');
 const requestForm=document.getElementById('requestForm');
 let modalCtrl=null, modalOpen=false;
+const modalAlready=document.getElementById('modalAlready');
+const alreadyHeading=document.getElementById('alreadyHeading');
+const alreadyText=document.getElementById('alreadyText');
+const ALR={
+  en:{h:"You're already on our list",t:"We've received your request — we'll get back to you within one business day."},
+  ru:{h:"Вы уже оставили заявку",t:"Мы получили ваше обращение — ответим в течение одного рабочего дня."},
+  ua:{h:"Ви вже залишили заявку",t:"Ми отримали ваше звернення — відповімо протягом одного робочого дня."},
+  pl:{h:"Zgłoszenie już wysłane",t:"Otrzymaliśmy Twoją prośbę — odpowiemy w ciągu jednego dnia roboczego."}
+};
+function setCookie(n,v,days){ const d=new Date(); d.setTime(d.getTime()+days*864e5); document.cookie=n+'='+v+';expires='+d.toUTCString()+';path=/;SameSite=Lax'; }
+function getCookie(n){ const m=document.cookie.split('; ').find(r=>r.indexOf(n+'=')===0); return m?m.split('=')[1]:''; }
+function hasRequested(){ try{ if(localStorage.getItem('bnsh_requested')==='1') return true; }catch(e){} return getCookie('bnsh_requested')==='1'; }
+function markRequested(){ setCookie('bnsh_requested','1',365); try{ localStorage.setItem('bnsh_requested','1'); }catch(e){} }
 function openModal(){
   if(modalOpen) return;
   modalOpen=true;
   modal.hidden=false;
   stopScroll();
+  if(hasRequested()){ modalFormBox.hidden=true; modalSuccess.hidden=true; modalAlready.hidden=false; alreadyHeading.textContent=ALR[state.lang].h; alreadyText.textContent=ALR[state.lang].t; }
+  else { modalFormBox.hidden=false; modalSuccess.hidden=true; modalAlready.hidden=true; }
   modalPanel.style.opacity='0'; modalPanel.style.transform='translateY(28px)';
   requestAnimationFrame(()=>{
     if(modalCtrl)modalCtrl.stop();
@@ -1077,13 +1099,14 @@ function closeModal(){
   modalCtrl=spring(1,0,{tension:260,friction:30,onUpdate:x=>{ modalPanel.style.opacity=x; modalPanel.style.transform=`translateY(${18*(1-x)}px)`; }, onRest:()=>{ modal.hidden=true; }});
   startScroll();
   document.removeEventListener('keydown', modalEsc);
-  setTimeout(()=>{ requestForm.reset(); modalFormBox.hidden=false; modalSuccess.hidden=true; }, 300);
+  setTimeout(()=>{ requestForm.reset(); modalFormBox.hidden=false; modalSuccess.hidden=true; modalAlready.hidden=true; }, 300);
 }
 function modalEsc(e){ if(e.key==='Escape') closeModal(); }
 modal.addEventListener('click', e=>{ if(e.target===modal) closeModal(); });
 modalPanel.addEventListener('click', e=>e.stopPropagation());
 document.getElementById('modalClose').addEventListener('click', closeModal);
 document.getElementById('successClose').addEventListener('click', closeModal);
+document.getElementById('alreadyClose').addEventListener('click', closeModal);
 const WEB3FORMS_KEY = 'd74cff37-56a1-4f73-9888-484164476a5b';
 const SEND_ERR = { en:'Something went wrong. Please try again or email us directly.', ru:'Что-то пошло не так. Попробуйте ещё раз или напишите нам на почту.', ua:'Щось пішло не так. Спробуйте ще раз або напишіть нам на пошту.', pl:'Coś poszło nie tak. Spróbuj ponownie lub napisz do nas mailowo.' };
 const submitLabel=document.getElementById('submitLabel');
@@ -1100,7 +1123,7 @@ requestForm.addEventListener('submit', async e=>{
   try{
     const res=await fetch('https://api.web3forms.com/submit',{ method:'POST', headers:{'Content-Type':'application/json','Accept':'application/json'}, body:JSON.stringify(payload) });
     const data=await res.json().catch(()=>({}));
-    if(res.ok && data.success){ modalFormBox.hidden=true; modalSuccess.hidden=false; }
+    if(res.ok && data.success){ markRequested(); modalFormBox.hidden=true; modalSuccess.hidden=false; }
     else throw new Error(data.message||'submit failed');
   }catch(err){
     if(modalErr){ modalErr.textContent=(SEND_ERR[state.lang]||SEND_ERR.en); modalErr.hidden=false; }
@@ -1180,7 +1203,7 @@ document.querySelectorAll('.pill').forEach(pill=>{
     const n=Math.min(Math.ceil(dist/stepSz),60);
     for(let i=1;i<=n;i++){ points.push({ x:last.x+ddx*(i/n), y:last.y+ddy*(i/n) }); }
     last={x,y};
-  });
+  }, {passive:true});
 
   function stamp(x,y){
     const c=diam/2;
