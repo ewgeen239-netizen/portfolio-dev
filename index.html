@@ -213,13 +213,7 @@ img{ display:block }
 
 /* ---------- about ---------- */
 #about .wrap{ display:grid; grid-template-columns:1fr; align-items:center; gap:3rem; padding:5rem 1.25rem }
-.globe-block{ position:relative; min-height:16rem; border-radius:1.5rem; overflow:hidden; box-shadow:0 0 0 1px rgba(255,255,255,.06) }
-.globe-photo{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center; z-index:0 }
-.globe-block::after{ content:''; position:absolute; inset:0; z-index:1; pointer-events:none; background:linear-gradient(to top, rgba(10,10,10,.9), rgba(10,10,10,.12) 55%, rgba(10,10,10,.5)) }
-.photo-eyebrow{ position:absolute; top:1.25rem; left:1.25rem; z-index:2 }
-.photo-caption{ z-index:2; position:absolute; left:1.25rem; right:1.25rem; bottom:1.25rem; color:#fff }
-.photo-caption .svg-icon{ color:#fff }
-.photo-caption span{ color:#fff }
+.globe-block{ position:relative; min-height:14rem }
 .globe-bg{ position:absolute; left:-1rem; top:50%; transform:translateY(-50%); font-size:12rem; color:rgba(17,17,17,.1) }
 .globe-caption{ display:flex; align-items:center; gap:.75rem; font-size:.875rem; color:rgba(17,17,17,.7); position:relative }
 .globe-caption .svg-icon{ font-size:1.5rem; color:#111 }
@@ -237,7 +231,7 @@ img{ display:block }
 @media (min-width:640px){ .statement h2{ font-size:1.875rem } .globe-bg{ font-size:16rem } }
 @media (min-width:1024px){
   #about .wrap{ grid-template-columns:1fr 1fr; padding-top:7rem; padding-bottom:7rem; padding-left:2rem; padding-right:2rem }
-  .globe-block{ min-height:24rem } .globe-bg{ left:-1.5rem; font-size:20rem }
+  .globe-block{ min-height:20rem } .globe-bg{ left:-1.5rem; font-size:20rem }
 }
 @media (min-width:640px){ #about .wrap{ padding-left:2rem; padding-right:2rem } }
 
@@ -498,9 +492,9 @@ footer .inner{ position:relative; z-index:10; padding:5rem 1.25rem 2.5rem }
   <section id="about" style="background:transparent">
     <div class="wrap shell">
       <div class="globe-block">
-        <img class="globe-photo" src="coder.jpg" alt="Late-night build session at BNSH" loading="lazy" decoding="async" />
-        <span class="eyebrow tone-light photo-eyebrow"><span class="dot"></span><span data-i18n="about_eyebrow">The Studio</span></span>
-        <div class="globe-caption photo-caption rv rv-up" style="--rv-y:12px">
+        <span class="globe-bg svg-icon" data-icon="globe"></span>
+        <span class="eyebrow tone-dark" style="position:relative"><span class="dot"></span><span data-i18n="about_eyebrow">The Studio</span></span>
+        <div class="globe-caption rv rv-up" style="--rv-y:12px; position:absolute; left:0; bottom:0">
           <span class="svg-icon" data-icon="globe"></span>
           <span data-i18n="globe_caption">A distributed team building across every time zone.</span>
         </div>
