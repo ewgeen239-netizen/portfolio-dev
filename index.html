@@ -13,7 +13,16 @@
 /* ---------- reset / base ---------- */
 *{ box-sizing:border-box; margin:0; padding:0 }
 html{ font-size:16px; -webkit-font-smoothing:antialiased }
-body{ background:#ffffff; color:#111111; font-family:'Onest',sans-serif; overflow-x:hidden }
+body{
+  color:#111111; font-family:'Onest',sans-serif; overflow-x:hidden;
+  background-color:#e3e2df;
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(17,17,17,.05) 1px, transparent 0),
+    radial-gradient(circle at 11px 11px, rgba(17,17,17,.028) 1px, transparent 0),
+    linear-gradient(180deg, #ededeb 0%, #e5e4e0 42%, #d6d5d0 100%);
+  background-size:22px 22px, 22px 22px, 100% 100%;
+  background-repeat:repeat, repeat, no-repeat;
+}
 a{ color:inherit; text-decoration:none }
 button{ font:inherit; color:inherit; background:none; border:none; cursor:pointer }
 ul{ list-style:none }
@@ -447,7 +456,7 @@ footer .inner{ position:relative; z-index:10; padding:5rem 1.25rem 2.5rem }
   </section>
 
   <!-- ============ ABOUT ============ -->
-  <section id="about" style="background:#fff">
+  <section id="about" style="background:transparent">
     <div class="wrap shell">
       <div class="globe-block">
         <span class="globe-bg svg-icon" data-icon="globe"></span>
@@ -475,7 +484,7 @@ footer .inner{ position:relative; z-index:10; padding:5rem 1.25rem 2.5rem }
   </section>
 
   <!-- ============ CREATE BAND ============ -->
-  <section class="createband" style="background:#fff">
+  <section class="createband" style="background:transparent">
     <ul class="shell">
       <li class="rv rv-up" style="--rv-y:28px" data-delay="0"><div class="create-tile v-light" data-i18n="cb_we">We</div></li>
       <li class="rv rv-up" style="--rv-y:28px" data-delay="120"><div class="create-tile v-accent" data-i18n="cb_build">Build</div></li>
@@ -485,7 +494,7 @@ footer .inner{ position:relative; z-index:10; padding:5rem 1.25rem 2.5rem }
   </section>
 
   <!-- ============ PORTFOLIO ============ -->
-  <section id="works" style="background:#fff">
+  <section id="works" style="background:transparent">
     <div class="wrap shell">
       <div class="center-col">
         <span class="eyebrow tone-dark bordered rv rv-up" style="--rv-y:10px"><span class="dot"></span><span data-i18n="portfolio_eyebrow">Portfolio</span></span>
@@ -496,7 +505,7 @@ footer .inner{ position:relative; z-index:10; padding:5rem 1.25rem 2.5rem }
   </section>
 
   <!-- ============ SERVICES ============ -->
-  <section id="services" style="background:#fff">
+  <section id="services" style="background:transparent">
     <div class="wrap shell">
       <span class="eyebrow tone-dark rv rv-up" style="--rv-y:10px"><span class="dot"></span><span data-i18n="services_eyebrow">Services</span></span>
       <h2 class="serv-h2 linereveal" data-delay="120"><span class="line"><span data-i18n="services_h2">What we do best</span></span></h2>
@@ -505,7 +514,7 @@ footer .inner{ position:relative; z-index:10; padding:5rem 1.25rem 2.5rem }
   </section>
 
   <!-- ============ STATS ============ -->
-  <section id="stats" style="background:#fff">
+  <section id="stats" style="background:transparent">
     <div class="wrap shell">
       <div class="stats-panel rv rv-scale" style="--rv-y:40px;--rv-s:.99">
         <span class="eyebrow tone-light"><span class="dot"></span><span data-i18n="stats_eyebrow">By the numbers</span></span>
@@ -662,7 +671,9 @@ applyAdaptiveGrid();
 addEventListener('resize', applyAdaptiveGrid);
 
 /* ================= Lenis + scroll lock ================= */
-window.scrollTo(0,0);
+const RESET_SCROLL_ON_LOAD = true;                         // on refresh, jump page to top
+if('scrollRestoration' in history) history.scrollRestoration = 'manual';
+if(RESET_SCROLL_ON_LOAD) window.scrollTo(0,0);
 const lenis = new Lenis({ smoothWheel:true });
 function raf(t){ lenis.raf(t); requestAnimationFrame(raf); }
 requestAnimationFrame(raf);
@@ -1149,9 +1160,15 @@ document.querySelectorAll('.pill').forEach(pill=>{
   ro.observe(container);
   resize();
 
+  // perf: only run the brush loop while the hero is on screen and the tab is visible
+  let heroVisible=true;
+  const io=new IntersectionObserver(es=>{ heroVisible=es[0].isIntersecting; }, { threshold:0 });
+  io.observe(container);
+
   const points=[];
   let last=null;
   window.addEventListener('pointermove', e=>{
+    if(!heroVisible) return;
     const rect=canvas.getBoundingClientRect();
     const x=(e.clientX-rect.left)*dpr;
     const y=(e.clientY-rect.top)*dpr;
@@ -1184,6 +1201,7 @@ document.querySelectorAll('.pill').forEach(pill=>{
 
   let idle=0;
   function tick(){
+    if(!heroVisible || document.hidden){ requestAnimationFrame(tick); return; }
     const drawing = points.length>0;
     if(drawing) idle=0; else { idle++; if(idle>120){ /* keep clearing once */ } }
     if(idle<=120 || drawing){
