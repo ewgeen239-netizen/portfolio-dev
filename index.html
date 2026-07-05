@@ -353,6 +353,7 @@ footer .inner{ position:relative; z-index:10; padding:5rem 1.25rem 2.5rem }
 .navlang{ padding:.375rem .625rem; border-radius:.5rem; border:1px solid rgba(255,255,255,.15); font-size:.75rem; font-weight:500; text-transform:uppercase; letter-spacing:.05em; color:rgba(255,255,255,.55); transition:background .2s, color .2s, border-color .2s }
 .navlang:hover{ color:#fff; border-color:rgba(255,255,255,.4) }
 .navlang.active{ background:#cf8047; border-color:#cf8047; color:#fff }
+.merr{ font-size:.8125rem; color:#b15f2c; line-height:1.4 }
 [hidden]{ display:none !important }
 </style>
 </head>
@@ -596,9 +597,11 @@ footer .inner{ position:relative; z-index:10; padding:5rem 1.25rem 2.5rem }
         <h2 data-i18n="modal_heading">Tell us what you're building.</h2>
       </div>
       <form id="requestForm">
+        <input type="checkbox" name="botcheck" class="hp" style="display:none !important" tabindex="-1" autocomplete="off" aria-hidden="true" />
         <label><span class="cap" data-i18n="f_name">Name</span><input type="text" name="name" required placeholder="Your name" data-i18n-ph="ph_name" /></label>
         <label><span class="cap" data-i18n="f_email">Email</span><input type="email" name="email" required placeholder="you@company.com" data-i18n-ph="ph_email" /></label>
         <label><span class="cap" data-i18n="f_project">Project</span><textarea name="project" rows="4" required placeholder="A few words about your project, timeline, and budget." data-i18n-ph="ph_project"></textarea></label>
+        <p class="merr" id="modalErr" hidden></p>
         <div class="mbottom">
           <span class="mnote" data-i18n="modal_note">We reply within one business day.</span>
           <button type="submit" class="pill witharrow v-dark" id="submitBtn"><span class="scale"><span class="body" id="submitLabel"><span data-i18n="send_request">Send request</span><span class="badge"><span class="svg-icon" data-icon="arrowup"></span></span></span></span></button>
@@ -1070,14 +1073,29 @@ modal.addEventListener('click', e=>{ if(e.target===modal) closeModal(); });
 modalPanel.addEventListener('click', e=>e.stopPropagation());
 document.getElementById('modalClose').addEventListener('click', closeModal);
 document.getElementById('successClose').addEventListener('click', closeModal);
+const WEB3FORMS_KEY = 'd74cff37-56a1-4f73-9888-484164476a5b';
+const SEND_ERR = { en:'Something went wrong. Please try again or email us directly.', ru:'Что-то пошло не так. Попробуйте ещё раз или напишите нам на почту.', ua:'Щось пішло не так. Спробуйте ще раз або напишіть нам на пошту.', pl:'Coś poszło nie tak. Spróbuj ponownie lub napisz do nas mailowo.' };
 const submitLabel=document.getElementById('submitLabel');
-requestForm.addEventListener('submit', e=>{
+const submitBtn=document.getElementById('submitBtn');
+const modalErr=document.getElementById('modalErr');
+function setSubmitLabel(k){ const el=submitLabel.querySelector('[data-i18n]'); if(el) el.textContent=t(k); }
+requestForm.addEventListener('submit', async e=>{
   e.preventDefault();
-  submitLabel.querySelector('[data-i18n]').textContent=t('sending');
-  setTimeout(()=>{
-    modalFormBox.hidden=true; modalSuccess.hidden=false;
-    submitLabel.querySelector('[data-i18n]').textContent=t('send_request');
-  }, 700);
+  if(modalErr) modalErr.hidden=true;
+  const fd=new FormData(requestForm);
+  if(fd.get('botcheck')) return; // honeypot tripped -> silently drop
+  setSubmitLabel('sending'); submitBtn.disabled=true;
+  const payload={ access_key:WEB3FORMS_KEY, subject:'New project request — BNSH', from_name:'BNSH website', name:fd.get('name'), email:fd.get('email'), message:fd.get('project') };
+  try{
+    const res=await fetch('https://api.web3forms.com/submit',{ method:'POST', headers:{'Content-Type':'application/json','Accept':'application/json'}, body:JSON.stringify(payload) });
+    const data=await res.json().catch(()=>({}));
+    if(res.ok && data.success){ modalFormBox.hidden=true; modalSuccess.hidden=false; }
+    else throw new Error(data.message||'submit failed');
+  }catch(err){
+    if(modalErr){ modalErr.textContent=(SEND_ERR[state.lang]||SEND_ERR.en); modalErr.hidden=false; }
+  }finally{
+    setSubmitLabel('send_request'); submitBtn.disabled=false;
+  }
 });
 
 /* mark up-right arrows for pill badge motion */
