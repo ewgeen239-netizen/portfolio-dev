@@ -349,6 +349,10 @@ footer .inner{ position:relative; z-index:10; padding:5rem 1.25rem 2.5rem }
 .langopt:hover{ background:#f1f0ee; color:#111 }
 .langopt.active{ color:#111; font-weight:600 }
 .langopt .code{ font-size:.625rem; text-transform:uppercase; letter-spacing:.05em; color:rgba(17,17,17,.4) }
+.navlangs{ display:flex; gap:.375rem }
+.navlang{ padding:.375rem .625rem; border-radius:.5rem; border:1px solid rgba(255,255,255,.15); font-size:.75rem; font-weight:500; text-transform:uppercase; letter-spacing:.05em; color:rgba(255,255,255,.55); transition:background .2s, color .2s, border-color .2s }
+.navlang:hover{ color:#fff; border-color:rgba(255,255,255,.4) }
+.navlang.active{ background:#cf8047; border-color:#cf8047; color:#fff }
 [hidden]{ display:none !important }
 </style>
 </head>
@@ -576,6 +580,7 @@ footer .inner{ position:relative; z-index:10; padding:5rem 1.25rem 2.5rem }
     <ul id="menuList"></ul>
   </nav>
   <div class="bottom shell">
+    <div class="navlangs" id="navLangs"></div>
     <span id="menuLocalTime">Local time</span>
     <button class="startp" id="menuStart" data-i18n="start_project_arrow">Start a project →</button>
   </div>
@@ -1257,7 +1262,7 @@ function setLang(lang){
   renderCardItem();
   setStatement(lang);
   tickClock();
-  document.querySelectorAll('.langopt').forEach(b=>b.classList.toggle('active', b.dataset.code===lang));
+  document.querySelectorAll('.langopt,.navlang').forEach(b=>b.classList.toggle('active', b.dataset.code===lang));
 }
 const langBtn=document.getElementById('langBtn'), langMenu=document.getElementById('langMenu');
 LANGS.forEach(L=>{
@@ -1266,6 +1271,12 @@ LANGS.forEach(L=>{
   b.addEventListener('click', ()=>{ setLang(L.code); closeLang(); });
   langMenu.appendChild(b);
 });
+const navLangs=document.getElementById('navLangs');
+if(navLangs){ LANGS.forEach(L=>{
+  const b=document.createElement('button'); b.className='navlang'; b.dataset.code=L.code; b.textContent=L.code;
+  b.addEventListener('click', ()=>setLang(L.code));
+  navLangs.appendChild(b);
+}); }
 let langOpen=false;
 function openLang(){ langOpen=true; langMenu.classList.add('open'); langBtn.setAttribute('aria-expanded','true'); }
 function closeLang(){ langOpen=false; langMenu.classList.remove('open'); langBtn.setAttribute('aria-expanded','false'); }
